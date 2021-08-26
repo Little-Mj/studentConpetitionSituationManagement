@@ -1,0 +1,130 @@
+﻿#include "adminOperaterDlg.h"
+#include "ui_studentdialog.h"
+#include<QMessageBox>
+#include"studentadddialog.h"
+#include<QSqlError>
+adminOperaterDlg::adminOperaterDlg(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::adminOperaterDlg)
+{
+    ui->setupUi(this);
+
+    model = new QSqlTableModel(this);
+    model->setTable("student");
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);//
+
+    //不显示第二列
+    //model->removeColumn(1);
+
+    //查询整张表
+    model->select();
+
+    ui->tableView->setModel(model);
+
+    //设置视图不可编辑
+    //ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+
+adminOperaterDlg::~adminOperaterDlg()
+{
+    delete ui;
+}
+
+void adminOperaterDlg::on_pushButton_clicked()
+{
+    //开启事务
+    model->database().transaction();
+    if(model->submitAll())
+    {
+        //提交事务
+        model->database().commit();
+    }
+    else
+    {
+        //回滚事务
+        model->database().rollback();
+        QMessageBox::warning(this,"TableView",tr("数据库错误：%1").arg(model->lastError().text()));
+    }
+}
+
+void adminOperaterDlg::on_pushButton_2_clicked()
+{
+    model->revertAll();
+}
+
+void adminOperaterDlg::on_pushButton_5_clicked()
+{
+    //    QString name = ui->lineEdit->text();
+    //    //更具姓名筛选
+    //    model->setFilter(QString("name = %1").arg(name));
+    //    //显示结果
+    //    model->select();
+       QString name = ui->lineEdit->text();
+       //根据姓名筛选
+       model->setFilter(QString("name = '%1'").arg(name));
+        //显示结果
+       model->select();
+}
+
+void adminOperaterDlg::on_pushButton_7_clicked()
+{
+    model->setTable("student");
+    model->select();
+}
+
+void adminOperaterDlg::on_pushButton_6_clicked()
+{
+    //setSort()函数进行排序，
+    //它有两个参数，第一个参数表示按第几个字段排序，表头从左向右，
+    //最左边是第0个字段，这里就是id字段。第二个参数是排序方法，有升序和降序两种。
+    model->setSort(0,Qt::AscendingOrder);
+    model->select();
+}
+
+void adminOperaterDlg::on_pushButton_8_clicked()
+{
+    model->setSort(0, Qt::DescendingOrder);
+
+    model->select();
+}
+
+void adminOperaterDlg::on_pushButton_4_clicked()
+{
+    //获取选中行
+    int curRow = ui->tableView->currentIndex().row();
+
+    //删除改行
+    model->removeRow(curRow);
+
+    int ret;
+    ret = QMessageBox::warning(this,"删除当前行","你确定删除当前行吗？",QMessageBox::Yes|QMessageBox::No);
+    if(ret == QMessageBox::Yes)
+    {
+        //把删除操作提交到数据库
+        model->submitAll();
+    }
+    else
+    {
+        //撤销修改
+        model->revertAll();
+    }
+}
+
+void adminOperaterDlg::on_pushButton_3_clicked()
+{
+    //获取表的行数
+    //    int row = model->rowCount();
+
+    //    int id =18;
+    //    model->insertRow(row);
+    //    model->setData(model->index(row,0),id);
+    //    model->setData(model->index(row,1),name);
+    //    model->setData(model->index(row,2),age);
+    //    model->setData(model->index(row,3),major);
+    //    model->setData(model->index(row,4),student_class);
+    //    model->setData(model->index(row,4),phone);
+
+    studentAddDialog stuAdd;
+    stuAdd.exec();
+}
