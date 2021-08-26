@@ -2,7 +2,6 @@
 #include <QApplication>
 #include "logindialog.h"
 #include "sqlconnection.h"
-#include "studentdialog.h"
 #include "studentmainwindow.h"
 
 int main(int argc, char *argv[])

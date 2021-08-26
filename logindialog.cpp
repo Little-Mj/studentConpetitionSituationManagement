@@ -3,7 +3,6 @@
 #include <QMessageBox>
 #include <sqlconnection.h>
 #include <QSqlQuery>
-#include "studentdialog.h"
 
 
 LoginDialog::LoginDialog(QString *student_id,QWidget *parent) :
