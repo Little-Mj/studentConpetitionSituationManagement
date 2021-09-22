@@ -1,7 +1,6 @@
 ﻿#include "logindialog.h"
 #include "ui_logindialog.h"
 #include <QMessageBox>
-#include <sqlconnection.h>
 #include <QSqlQuery>
 
 
@@ -27,11 +26,11 @@ void LoginDialog::on_pushButton_clicked()
     //管理员登录
     QSqlQuery qurry;
     QString isAdmin="0";
-    if(ui->adminRadioButton->isChecked())
+    if(ui->adminRadioButton->isChecked())//是管理员账户
     {
         isAdmin ="1";
     }
-
+    //查询用户表查看是否有此用户
     qurry.exec(QString("select id,password from users where isAdmin = %1 and id = '%2'").arg(isAdmin,ui->ursLineEdit->text()));
     qurry.next();
     if(qurry.value(0).isNull())
@@ -44,6 +43,7 @@ void LoginDialog::on_pushButton_clicked()
     }
     else
     {
+        //存在用户，验证密码
         if(ui->pwdLineEdit->text() == qurry.value(1).toString())
         {
             //学生界面

@@ -36,10 +36,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>退出</string>
+    <string>取消</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>40</x>

@@ -41,6 +41,7 @@ void studentMainWindow::on_pushButton_clicked()
         model->setHeaderData(i,Qt::Horizontal,tables[i]);
     QTableView *view = new QTableView;
     view->setModel(model);
+    //设置自适应列宽
     view->show();
 }
 
@@ -49,10 +50,10 @@ void studentMainWindow::on_pushButton_2_clicked()
     //查看获奖记录
     model->setQuery(QString("select student.id,student.name,student.major,"
                             "competition.name,competition.degree,"
-                            "competitiom_situation.grade,competitiom_situation time "
+                            "competition_situation.grade,competition_situation.time "
                             " from student,competition,competition_situation "
-                            "   where student_id = '%1' and student.id=competitiom_situation.student_id and"
-                            "           competitiom_situation.competition_id = competition.id").arg(id));
+                            "   where student_id = %1 and student.id=competition_situation.student_id and"
+                            "           competition_situation.competition_id = competition.id").arg(id));
     QStringList tables;
     tables <<"学生学号"<<"学生姓名"<<"专业"<<"竞赛名称"<<"竞赛级别"<<"获奖情况"<<"获奖时间";
     for(int i=0;i<tables.count();i++)

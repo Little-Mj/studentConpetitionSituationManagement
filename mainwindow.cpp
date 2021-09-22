@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //初始化model
     model = new QSqlTableModel(this);
-    setTable_student();//默认先输出学生信息
+    on_stuRadioButton_clicked(1);//默认先输出学生信息
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->select();
 
@@ -48,6 +48,11 @@ void MainWindow::student_Search()
         attribute="phone";
     curAtr = ui->lineEdit->text();
     model->setFilter(QString("%1='%2'").arg(attribute,curAtr));
+    if(model->rowCount()==0)
+    {
+        model->select();//恢复tableview
+        QMessageBox::warning(this,"数据查询","未查询到相应数据");
+    }
     //ui->lineEdit->setText(attribute);
 }
 
@@ -68,6 +73,11 @@ void MainWindow::competition_Search()
 
     curAtr = ui->lineEdit->text();
     model->setFilter(QString("%1='%2'").arg(attribute,curAtr));
+    if(model->rowCount()==0)
+    {
+        model->select();//恢复tableview
+        QMessageBox::warning(this,"数据查询","未查询到相应数据");
+    }
     //ui->lineEdit->setText(attribute);
 }
 
@@ -88,6 +98,11 @@ void MainWindow::competionSituation_Search()
 
     curAtr = ui->lineEdit->text();
     model->setFilter(QString("%1='%2'").arg(attribute,curAtr));
+    if(model->rowCount()==0)
+    {
+        model->select();//恢复tableview
+        QMessageBox::warning(this,"数据查询","未查询到相应数据");
+    }
     //ui->lineEdit->setText(attribute);
 }
 
@@ -198,6 +213,7 @@ void MainWindow::on_pushButton_9_clicked()
     if(model->submitAll())
     {
         model->database().commit();//提交
+        QMessageBox::warning(this,"tableModel","修改成功");//提示
     }
     else
     {
@@ -209,6 +225,7 @@ void MainWindow::on_pushButton_9_clicked()
 void MainWindow::on_pushButton_10_clicked()
 {
     model->revertAll();
+    QMessageBox::warning(this,"tableModel","撤销成功");//提示
 }
 
 void MainWindow::on_pushButton_11_clicked()
@@ -238,7 +255,7 @@ void MainWindow::on_radioButton_clicked(bool checked)
     ui->comboBox->clear();
     ui->sortComboBox_2->clear();
     QStringList strlist;
-    strlist<<"学生学号"<<"竞赛名称"<<"奖项"<<"时间";
+    strlist<<"学生学号"<<"竞赛代码"<<"奖项"<<"时间";
     ui->comboBox->addItems(strlist);
     ui->sortComboBox_2->addItems(strlist);
 }
@@ -290,17 +307,18 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pushButton_3_clicked()
 {
-
+    //查询详细获奖信息
     //show_competition_situation();
     QSqlQueryModel *query = new QSqlQueryModel;
-    //设置获奖情况表
+    //对student，competition,competition_stutation 表进行联合查询
     query->setQuery("select student.id,student.name,student.major,"
-                    "competition.name,competition.degree,"
-                    "competition_situation.grade,competition_situation.time "
-                    " from student,competition,competition_situation "
-                    " where student.id=competition_situation.student_id and"
-                    " competition_situation.competition_id = competition.id");
+                    " competition.name,competition.degree,"
+                    " competition_situation.grade,competition_situation.time "
+                    "   from student,competition,competition_situation "
+                    "       where student.id=competition_situation.student_id and"
+                    "               competition_situation.competition_id = competition.id");
     QStringList tables;
+    //设置数据表头
     tables <<"学生学号"<<"学生姓名"<<"专业"<<"竞赛名称"<<"竞赛级别"<<"获奖情况"<<"获奖时间";
     for(int i=0;i<tables.count();i++)
         query->setHeaderData(i,Qt::Horizontal,tables[i]);
